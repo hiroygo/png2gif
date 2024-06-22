@@ -10,20 +10,17 @@ import (
 )
 
 func filterFiles(dir, ext string) ([]string, error) {
-	var pathes []string
-	err := filepath.Walk(dir, func(visitPath string, f os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if filepath.Ext(f.Name()) == ext {
-			pathes = append(pathes, visitPath)
-		}
-		return nil
-	})
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
 
+	var pathes []string
+	for _, file := range files {
+		if file.Type().IsRegular() && filepath.Ext(file.Name()) == ext {
+			pathes = append(pathes, filepath.Join(dir, file.Name()))
+		}
+	}
 	return pathes, nil
 }
 
